@@ -6,10 +6,10 @@
     "packages/*"
   ],
   "scripts": {
-    "install:all": "pnpm -w install",
-    "dev:backend": "pnpm -w --filter ./packages/backend dev",
-    "dev:frontend": "pnpm -w --filter ./packages/frontend dev",
-    "dev": "concurrently \"pnpm dev:backend\" \"pnpm dev:frontend\""
+    "install:all": "npm install",
+    "dev:backend": "npm -w packages/backend run dev",
+    "dev:frontend": "npm -w packages/frontend run dev",
+    "dev": "concurrently \"npm -w packages/backend run dev\" \"npm -w packages/frontend run dev\""
   },
   "devDependencies": {
     "concurrently": "^8.2.0"
