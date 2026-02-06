@@ -1,10 +1,10 @@
-# Backend (NestJS)
+# Backend
 
 개발:
 
 ```bash
-pnpm --filter ./packages/backend install
-pnpm --filter ./packages/backend dev
+npm --workspace ./packages/backend install
+npm --workspace ./packages/backend run dev
 ```
 
 기본 엔드포인트:
