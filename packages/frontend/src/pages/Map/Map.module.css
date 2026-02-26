@@ -1,0 +1,220 @@
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  margin: 0;
+  color: #1a1a2e;
+}
+
+.addBtn {
+  background: #6c5ce7;
+  color: #fff;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.addBtn:hover {
+  background: #5a4bd1;
+}
+
+/* Upload */
+.uploadCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+}
+
+.uploadCard h3 {
+  margin: 0 0 16px;
+  color: #1a1a2e;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input {
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.input:focus {
+  border-color: #6c5ce7;
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dropzone:hover {
+  border-color: #6c5ce7;
+  background: #f8f7ff;
+}
+
+.dropzone p {
+  font-size: 2rem;
+  margin: 0 0 8px;
+}
+.dropzone span {
+  color: #888;
+  font-size: 0.9rem;
+}
+.dropzoneHint {
+  color: #aaa;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.submitBtn {
+  align-self: flex-start;
+  background: #6c5ce7;
+  color: #fff;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.mapCard {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mapCard:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.mapPreview {
+  height: 160px;
+  background: linear-gradient(135deg, #dfe6e9, #b2bec3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #636e72;
+}
+
+.mapPreview span {
+  font-size: 2.5rem;
+}
+.mapPreview p {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+}
+
+.mapInfo {
+  padding: 16px;
+}
+.mapInfo h3 {
+  margin: 0 0 4px;
+  color: #1a1a2e;
+  font-size: 1rem;
+}
+.mapInfo p {
+  margin: 0;
+  color: #888;
+  font-size: 0.85rem;
+}
+
+/* Viewer */
+.mapViewer {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.mapViewer h2 {
+  margin: 0 0 16px;
+  color: #1a1a2e;
+}
+
+.viewerArea {
+  height: 400px;
+  background: #f5f6fa;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.viewerPlaceholder {
+  text-align: center;
+  color: #aaa;
+}
+
+.viewerPlaceholder p {
+  font-size: 3rem;
+  margin: 0 0 8px;
+}
+.viewerPlaceholder span {
+  display: block;
+  font-size: 0.95rem;
+}
+.viewerHint {
+  color: #ccc;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.viewerControls {
+  display: flex;
+  gap: 8px;
+}
+
+.controlBtn {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.controlBtn:hover {
+  border-color: #6c5ce7;
+  color: #6c5ce7;
+}

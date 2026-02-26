@@ -1,0 +1,216 @@
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  margin: 0;
+  color: #1a1a2e;
+}
+
+.addBtn {
+  background: #6c5ce7;
+  color: #fff;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.addBtn:hover {
+  background: #5a4bd1;
+}
+
+/* Invite */
+.inviteCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+}
+
+.inviteCard h3 {
+  margin: 0 0 12px;
+  color: #1a1a2e;
+}
+
+.inviteForm {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.input:focus {
+  border-color: #6c5ce7;
+}
+
+.select {
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.inviteBtn {
+  background: #6c5ce7;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Role Info */
+.roleInfo {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.roleCard {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.roleCard h4 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  color: #1a1a2e;
+}
+.roleCard p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* Member List */
+.memberList {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.memberList h2 {
+  margin: 0 0 16px;
+  color: #1a1a2e;
+}
+
+.ownerRow,
+.memberRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.memberInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.memberName {
+  font-weight: 600;
+  color: #1a1a2e;
+  font-size: 0.95rem;
+}
+.memberEmail {
+  color: #888;
+  font-size: 0.8rem;
+}
+
+.memberActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.roleBadgeAdmin {
+  background: #ffeaa7;
+  color: #d35400;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.roleBadgeEditor {
+  background: #dfe6e9;
+  color: #2d3436;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.roleBadgeViewer {
+  background: #f0f0f8;
+  color: #6c5ce7;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.joinedAt {
+  color: #aaa;
+  font-size: 0.8rem;
+}
+
+.removeBtn {
+  background: none;
+  border: 1px solid #ff6b6b;
+  color: #ff6b6b;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.removeBtn:hover {
+  background: #ff6b6b;
+  color: #fff;
+}

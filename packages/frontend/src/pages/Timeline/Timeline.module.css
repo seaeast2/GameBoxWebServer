@@ -1,0 +1,165 @@
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.header h1 {
+  margin: 0;
+  color: #1a1a2e;
+}
+
+.addBtn {
+  background: #6c5ce7;
+  color: #fff;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.addBtn:hover {
+  background: #5a4bd1;
+}
+
+/* Timeline View */
+.timelineView {
+  position: relative;
+  padding-left: 40px;
+  margin-bottom: 32px;
+}
+
+.line {
+  position: absolute;
+  left: 18px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: #e0e0e0;
+  border-radius: 2px;
+}
+
+.tlItem {
+  position: relative;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.tlDot {
+  position: absolute;
+  left: -28px;
+  top: 18px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  border: 3px solid #f5f6fa;
+  z-index: 1;
+  transition: background 0.2s;
+}
+
+.tlItemActive .tlDot {
+  background: #6c5ce7;
+}
+
+.tlCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.tlItem:hover .tlCard {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.tlItemActive .tlCard {
+  border-color: #6c5ce7;
+}
+
+.tlEpisode {
+  font-weight: 700;
+  color: #6c5ce7;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.tlSummary {
+  margin: 0 0 8px;
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.tlMeta {
+  display: flex;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* Detail */
+.detail {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.detail h2 {
+  margin: 0 0 8px;
+  color: #1a1a2e;
+}
+.detailSummary {
+  color: #555;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+.detailSection {
+  margin-bottom: 20px;
+}
+.detailSection h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  color: #1a1a2e;
+}
+.detailSection p {
+  margin: 0;
+  color: #555;
+}
+
+.charTags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.charTag {
+  background: #f0f0f8;
+  color: #6c5ce7;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.foreshadowTag {
+  background: #fff5f5;
+  color: #e17055;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  border-left: 3px solid #e17055;
+}

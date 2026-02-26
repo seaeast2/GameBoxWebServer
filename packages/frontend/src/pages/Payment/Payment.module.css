@@ -1,0 +1,176 @@
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.container h1 {
+  margin: 0 0 8px;
+  color: #1a1a2e;
+}
+.subtitle {
+  color: #888;
+  margin: 0 0 24px;
+}
+
+.currentPlan {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  padding: 16px 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 32px;
+  font-size: 0.95rem;
+}
+
+.currentPlan strong {
+  color: #6c5ce7;
+}
+
+.planStatus {
+  background: #d4fc79;
+  color: #2d6a4f;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+  align-items: start;
+}
+
+.planCard {
+  background: #fff;
+  border-radius: 16px;
+  padding: 36px 28px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  position: relative;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.planCard:hover {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+}
+
+.planPopular {
+  border-color: #6c5ce7;
+  transform: scale(1.03);
+}
+.planCurrent {
+  border-color: #51cf66;
+}
+
+.badge,
+.badgeCurrent {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 18px;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge {
+  background: #6c5ce7;
+  color: #fff;
+}
+.badgeCurrent {
+  background: #51cf66;
+  color: #fff;
+}
+
+.planCard h3 {
+  margin: 0 0 12px;
+  font-size: 1.3rem;
+  color: #1a1a2e;
+}
+
+.price {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #1a1a2e;
+  margin-bottom: 20px;
+}
+
+.price span {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #999;
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  text-align: left;
+}
+
+.featureList li {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.featureList li::before {
+  content: "✓ ";
+  color: #6c5ce7;
+  font-weight: 600;
+}
+
+.selectBtn {
+  width: 100%;
+  padding: 12px;
+  background: #6c5ce7;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.selectBtn:hover {
+  background: #5a4bd1;
+}
+
+.currentBtn {
+  width: 100%;
+  padding: 12px;
+  background: #f0f0f0;
+  color: #888;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: not-allowed;
+}
+
+.history {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.history h2 {
+  margin: 0 0 16px;
+  color: #1a1a2e;
+}
+
+.emptyHistory {
+  text-align: center;
+  padding: 40px;
+  color: #aaa;
+}

@@ -1,0 +1,173 @@
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.container h1 {
+  margin: 0 0 8px;
+  color: #1a1a2e;
+}
+.subtitle {
+  color: #888;
+  margin: 0 0 32px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+/* Input */
+.inputSection,
+.resultSection {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.inputSection h3,
+.resultSection h3 {
+  margin: 0 0 12px;
+  color: #1a1a2e;
+}
+
+.textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.6;
+  box-sizing: border-box;
+}
+
+.textarea:focus {
+  border-color: #6c5ce7;
+}
+
+.options {
+  display: flex;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.optionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.optionGroup label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.generateBtn {
+  background: #6c5ce7;
+  color: #fff;
+  padding: 12px 32px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+}
+
+.generateBtn:hover {
+  background: #5a4bd1;
+}
+.generateBtn:disabled {
+  background: #b0a8e8;
+  cursor: not-allowed;
+}
+
+/* Result */
+.resultArea {
+  min-height: 300px;
+  background: #f5f6fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+  line-height: 1.8;
+}
+
+.resultArea p {
+  margin: 0;
+  color: #333;
+}
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 260px;
+  color: #aaa;
+  text-align: center;
+}
+
+.placeholder p {
+  font-size: 2.5rem;
+  margin: 0 0 8px;
+}
+.placeholder span {
+  font-size: 0.9rem;
+}
+.placeholderHint {
+  font-size: 0.8rem;
+  color: #ccc;
+  margin-top: 4px;
+}
+
+.resultActions {
+  display: flex;
+  gap: 8px;
+}
+
+.actionBtn {
+  flex: 1;
+  background: #6c5ce7;
+  color: #fff;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.actionBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.actionBtnSecondary {
+  padding: 10px 16px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.actionBtnSecondary:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
