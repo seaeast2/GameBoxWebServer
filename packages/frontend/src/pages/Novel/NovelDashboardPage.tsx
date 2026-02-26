@@ -50,7 +50,7 @@ export default function NovelDashboardPage() {
       <div className={styles.dashHeader}>
         <h1>소설 대시보드</h1>
         <p className={styles.dashSubtitle}>
-          {novel ? `${novel.TITLE} · ${novel.GENRE || "미분류"}` : "로딩 중..."}
+          {novel ? `${novel.title} · ${novel.genre || "미분류"}` : "로딩 중..."}
         </p>
       </div>
 

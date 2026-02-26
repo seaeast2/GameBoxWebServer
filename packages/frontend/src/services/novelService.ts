@@ -1,14 +1,13 @@
 import api from './api';
 
 export interface Novel {
-    ID: number;
-    TITLE: string;
-    GENRE: string;
-    DESCRIPTION: string;
-    IS_COLLAB: string;
-    USER_ID: number;
-    CREATED_AT: string;
-    UPDATED_AT: string;
+    id: string;
+    title: string;
+    genre: string | null;
+    description: string | null;
+    is_collab: string;
+    user_id: string;
+    created_at: string;
 }
 
 export interface CreateNovelRequest {

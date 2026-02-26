@@ -30,9 +30,9 @@ export default function NovelCreatePage() {
       });
       // If collaboration enabled, update it
       if (form.isCollab) {
-        await novelService.update(String(res.data.ID), { is_collab: "Y" });
+        await novelService.update(res.data.id, { is_collab: "Y" });
       }
-      navigate(`/novels/${res.data.ID}`);
+      navigate(`/novels/${res.data.id}`);
     } catch (err: any) {
       setError(err.response?.data?.message || "소설 생성에 실패했습니다.");
     } finally {

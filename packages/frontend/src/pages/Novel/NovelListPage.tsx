@@ -35,18 +35,18 @@ export default function NovelListPage() {
         <div className={styles.grid}>
           {novels.map((novel) => (
             <Link
-              to={`/novels/${novel.ID}`}
-              key={novel.ID}
+              to={`/novels/${novel.id}`}
+              key={novel.id}
               className={styles.card}
             >
               <div className={styles.cardCover}>
-                <span className={styles.genre}>{novel.GENRE || "미분류"}</span>
+                <span className={styles.genre}>{novel.genre || "미분류"}</span>
               </div>
               <div className={styles.cardBody}>
-                <h3 className={styles.cardTitle}>{novel.TITLE}</h3>
+                <h3 className={styles.cardTitle}>{novel.title}</h3>
                 <p className={styles.cardMeta}>
-                  {novel.UPDATED_AT
-                    ? new Date(novel.UPDATED_AT).toLocaleDateString()
+                  {novel.created_at
+                    ? new Date(novel.created_at).toLocaleDateString()
                     : ""}
                 </p>
               </div>

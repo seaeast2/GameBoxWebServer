@@ -130,8 +130,8 @@ export default function MyPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {novels.map((novel) => (
                   <Link
-                    key={novel.ID}
-                    to={`/novels/${novel.ID}`}
+                    key={novel.id}
+                    to={`/novels/${novel.id}`}
                     style={{
                       padding: 12,
                       background: "#f5f6fa",
@@ -140,10 +140,10 @@ export default function MyPage() {
                       color: "#1a1a2e",
                     }}
                   >
-                    <strong>{novel.TITLE}</strong>
-                    {novel.GENRE && (
+                    <strong>{novel.title}</strong>
+                    {novel.genre && (
                       <span style={{ marginLeft: 8, color: "#888" }}>
-                        {novel.GENRE}
+                        {novel.genre}
                       </span>
                     )}
                   </Link>

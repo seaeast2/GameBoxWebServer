@@ -43,11 +43,13 @@ export class AuthService {
         });
 
         return {
-            id,
-            email: dto.email,
-            nickname: dto.nickname,
+            user: {
+                id,
+                email: dto.email,
+                nickname: dto.nickname,
+                role: 'user',
+            },
             access_token: token,
-            created_at: new Date().toISOString(),
         };
     }
 
@@ -74,10 +76,12 @@ export class AuthService {
         });
 
         return {
-            id: user.ID,
-            email: user.EMAIL,
-            nickname: user.NICKNAME,
-            role: user.ROLE,
+            user: {
+                id: user.ID,
+                email: user.EMAIL,
+                nickname: user.NICKNAME,
+                role: user.ROLE,
+            },
             access_token: token,
         };
     }

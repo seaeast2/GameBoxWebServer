@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as oracledb from 'oracledb';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const oracledb = require('oracledb');
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -12,6 +13,9 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     constructor(private configService: ConfigService) { }
 
     async onModuleInit() {
+        // Fetch CLOB columns as strings to avoid circular Lob stream objects
+        oracledb.fetchAsString = [oracledb.CLOB];
+
         const walletDir = path.resolve(
             this.configService.get<string>('WALLET_DIR', './assets/wallet'),
         );
