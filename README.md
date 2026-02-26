@@ -15,7 +15,27 @@
 npm install
 ```
 
-루트에서 실행하면 워크스페이스의 모든 패키지 의존성이 설치됩니다.
+- 데이터 베이스 접속 설정
+- Oracle Autonomous Database 지갑을 다운로드하여 `packages/backend` 디렉토리에 `wallet` 폴더로 압축 해제
+- `packages/backend/.env` 파일을 생성하고 ID, PW, DB_CONNECTION_STRING을 설정
+
+```env
+# Oracle Autonomous Database Configuration
+DB_USER=ADMIN
+DB_PASSWORD=
+DB_CONNECT_STRING=
+
+# Wallet Configuration (extracted wallet directory path)
+WALLET_DIR=
+WALLET_PASSWORD=
+
+# JWT Configuration
+JWT_SECRET=change_this_in_production
+JWT_EXPIRES_IN=7d
+
+# Server
+PORT=3001
+```
 
 **개발 서버 실행**
 
