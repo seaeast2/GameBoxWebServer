@@ -2,25 +2,6 @@
 
 - 이 프로젝트는 웹소설 생성기의 Back end 를 구성한다.
 
-# Oracle Autonomous AI Database 접속
-
-## TNS 이름
-
-- TNS 이름 : webnoveldb_high
-- 접속 문자열 : (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.ap-chuncheon-1.oraclecloud.com))(connect_data=(service_name=g5d7b291b1d4dba_webnoveldb_high.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
-
-- TNS 이름 : webnoveldb_medium
-- 접속 문자열 : (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.ap-chuncheon-1.oraclecloud.com))(connect_data=(service_name=g5d7b291b1d4dba_webnoveldb_medium.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
-
-- TNS 이름 : webnoveldb_low
-- 접속 문자열 : (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.ap-chuncheon-1.oraclecloud.com))(connect_data=(service_name=g5d7b291b1d4dba_webnoveldb_low.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
-
-- TNS 이름 : webnoveldb_tp
-- 접속 문자열 : (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.ap-chuncheon-1.oraclecloud.com))(connect_data=(service_name=g5d7b291b1d4dba_webnoveldb_tp.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
-
-- TNS 이름 : webnoveldb_tpurgent
-- 접속 문자열 : (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.ap-chuncheon-1.oraclecloud.com))(connect_data=(service_name=g5d7b291b1d4dba_webnoveldb_tpurgent.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
-
 ## Oracle Database 접속 샘플코드
 
 ```javascript
