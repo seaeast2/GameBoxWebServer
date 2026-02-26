@@ -5,7 +5,7 @@
 - **Backend**: Node.js + Nest.js
 - **Frontend**: React.js
 - **Database**:
-  - **개발중**: 로컬 PostgreSQL
+  - ~~**(취소)개발중**: 로컬 PostgreSQL~~
   - **실제 서비스**: Oracle Autonomous Database (Always Free Tier), Redis (캐싱 및 세션 관리)
 - **AI 기능**: OpenAI API 또는 유사 LLM API 연동
 - **결제 시스템**: Stripe, PayPal API
@@ -433,10 +433,9 @@ erDiagram
 ## 7. 확장 고려사항
 
 - Oracle Cloud Free Tier 환경에서 운영
-- Autonomous Database의 JSON 지원 활용
+- Autonomous AI Database 활용
 - DB 백업 및 복구는 OCI 자동화 기능 사용
-- 네트워크 보안: VCN, Security List, IAM 정책 적용
-- 확장 시 Oracle APEX를 통한 관리 UI 고려 가능
+
 - **결제 시스템**
   - Stripe/PayPal API 연동
   - 구독 플랜: Free / Premium / Team

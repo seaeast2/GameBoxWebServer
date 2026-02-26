@@ -1,1 +1,10 @@
 node_modules
+dist
+
+# Oracle Wallet (인증서/키 포함 - 절대 업로드 금지)
+packages/backend/assets/Wallet_WebNovelDB.zip
+packages/backend/assets/wallet/
+
+# 환경변수 (DB 비밀번호, JWT 시크릿 등)
+.env
+.env.local
