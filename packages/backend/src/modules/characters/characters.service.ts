@@ -10,13 +10,13 @@ export class CharactersService {
     async create(novelId: string, dto: CreateCharacterDto) {
         const id = uuidv4();
         await this.db.execute(
-            `INSERT INTO CHARACTERS (id, novel_id, name, level, stats, items)
-             VALUES (:id, :novel_id, :name, :level, :stats, :items)`,
+            `INSERT INTO CHARACTERS (id, novel_id, name, char_level, stats, items)
+             VALUES (:id, :novel_id, :name, :char_level, :stats, :items)`,
             {
                 id,
                 novel_id: novelId,
                 name: dto.name,
-                level: dto.level || 1,
+                char_level: dto.level || 1,
                 stats: dto.stats ? JSON.stringify(dto.stats) : null,
                 items: dto.items ? JSON.stringify(dto.items) : null,
             },
@@ -26,7 +26,7 @@ export class CharactersService {
 
     async findAllByNovel(novelId: string) {
         const result = await this.db.execute(
-            `SELECT id, novel_id, name, level, stats, items FROM CHARACTERS WHERE novel_id = :novel_id ORDER BY name`,
+            `SELECT id, novel_id, name, char_level, stats, items FROM CHARACTERS WHERE novel_id = :novel_id ORDER BY name`,
             { novel_id: novelId },
         );
         return (result.rows as any[]).map(this.mapRow);
@@ -34,7 +34,7 @@ export class CharactersService {
 
     async findOne(id: string) {
         const result = await this.db.execute(
-            `SELECT id, novel_id, name, level, stats, items FROM CHARACTERS WHERE id = :id`,
+            `SELECT id, novel_id, name, char_level, stats, items FROM CHARACTERS WHERE id = :id`,
             { id },
         );
         const row = (result.rows as any[])?.[0];
@@ -53,8 +53,8 @@ export class CharactersService {
             binds.name = dto.name;
         }
         if (dto.level !== undefined) {
-            setClauses.push('level = :level');
-            binds.level = dto.level;
+            setClauses.push('char_level = :char_level');
+            binds.char_level = dto.level;
         }
         if (dto.stats !== undefined) {
             setClauses.push('stats = :stats');
@@ -87,7 +87,7 @@ export class CharactersService {
             id: row.ID,
             novel_id: row.NOVEL_ID,
             name: row.NAME,
-            level: row.LEVEL,
+            level: row.CHAR_LEVEL,
             stats: row.STATS ? JSON.parse(row.STATS) : null,
             items: row.ITEMS ? JSON.parse(row.ITEMS) : null,
         };

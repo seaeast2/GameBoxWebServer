@@ -142,7 +142,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
                     id VARCHAR2(36) PRIMARY KEY,
                     novel_id VARCHAR2(36) NOT NULL,
                     name VARCHAR2(100) NOT NULL,
-                    level NUMBER DEFAULT 1,
+                    char_level NUMBER DEFAULT 1,
                     stats CLOB,
                     items CLOB,
                     CONSTRAINT fk_chars_novel FOREIGN KEY (novel_id) REFERENCES NOVELS(id) ON DELETE CASCADE
@@ -197,7 +197,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
                     id VARCHAR2(36) PRIMARY KEY,
                     character_id VARCHAR2(36) NOT NULL,
                     timeline_id VARCHAR2(36) NOT NULL,
-                    level NUMBER DEFAULT 1,
+                    char_level NUMBER DEFAULT 1,
                     stats CLOB,
                     items CLOB,
                     location VARCHAR2(255),
