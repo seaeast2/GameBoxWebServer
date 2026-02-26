@@ -1,36 +1,59 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import {
+  collaborationService,
+  Collaborator,
+} from "../../services/collaborationService";
+import { useAuth } from "../../contexts/AuthContext";
 import styles from "./Collaboration.module.css";
 
-const mockCollaborators = [
-  {
-    id: "1",
-    nickname: "작가B",
-    email: "writerB@example.com",
-    role: "editor",
-    joinedAt: "2026-02-20",
-  },
-  {
-    id: "2",
-    nickname: "편집자1",
-    email: "editor1@example.com",
-    role: "editor",
-    joinedAt: "2026-02-18",
-  },
-  {
-    id: "3",
-    nickname: "뷰어A",
-    email: "viewer@example.com",
-    role: "viewer",
-    joinedAt: "2026-02-15",
-  },
-];
-
 export default function CollaborationPage() {
-  const { id } = useParams();
+  const { id: novelId } = useParams();
+  const { user } = useAuth();
+  const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [showInvite, setShowInvite] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("editor");
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
+
+  const loadCollaborators = async () => {
+    if (!novelId) return;
+    try {
+      const res = await collaborationService.list(novelId);
+      setCollaborators(res.data);
+    } catch {}
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadCollaborators();
+  }, [novelId]);
+
+  const handleInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!novelId || !inviteEmail.trim()) return;
+    setMessage("");
+    try {
+      await collaborationService.create(novelId, {
+        user_email: inviteEmail,
+        role: inviteRole,
+      });
+      setInviteEmail("");
+      setShowInvite(false);
+      setMessage("멤버가 초대되었습니다.");
+      loadCollaborators();
+    } catch (err: any) {
+      setMessage(err.response?.data?.message || "초대에 실패했습니다.");
+    }
+  };
+
+  const handleRemove = async (id: number) => {
+    try {
+      await collaborationService.delete(String(id));
+      loadCollaborators();
+    } catch {}
+  };
 
   return (
     <div className={styles.container}>
@@ -44,13 +67,22 @@ export default function CollaborationPage() {
         </button>
       </div>
 
+      {message && (
+        <p
+          style={{
+            textAlign: "center",
+            color: message.includes("실패") ? "#e74c3c" : "#27ae60",
+            margin: "0 0 16px",
+          }}
+        >
+          {message}
+        </p>
+      )}
+
       {showInvite && (
         <div className={styles.inviteCard}>
           <h3>멤버 초대</h3>
-          <form
-            className={styles.inviteForm}
-            onSubmit={(e) => e.preventDefault()}
-          >
+          <form className={styles.inviteForm} onSubmit={handleInvite}>
             <input
               className={styles.input}
               type="email"
@@ -92,38 +124,63 @@ export default function CollaborationPage() {
         <h2>멤버 목록</h2>
         <div className={styles.ownerRow}>
           <div className={styles.memberInfo}>
-            <div className={styles.avatar}>나</div>
+            <div className={styles.avatar}>{user?.nickname?.[0] || "나"}</div>
             <div>
-              <div className={styles.memberName}>작가A (나)</div>
-              <div className={styles.memberEmail}>user@example.com</div>
+              <div className={styles.memberName}>
+                {user?.nickname || "나"} (나)
+              </div>
+              <div className={styles.memberEmail}>{user?.email || ""}</div>
             </div>
           </div>
           <span className={styles.roleBadgeAdmin}>관리자</span>
         </div>
-        {mockCollaborators.map((member) => (
-          <div key={member.id} className={styles.memberRow}>
-            <div className={styles.memberInfo}>
-              <div className={styles.avatar}>{member.nickname[0]}</div>
-              <div>
-                <div className={styles.memberName}>{member.nickname}</div>
-                <div className={styles.memberEmail}>{member.email}</div>
+        {loading ? (
+          <p style={{ padding: 16, color: "#888", textAlign: "center" }}>
+            로딩 중...
+          </p>
+        ) : collaborators.length === 0 ? (
+          <p style={{ padding: 16, color: "#888", textAlign: "center" }}>
+            초대된 멤버가 없습니다
+          </p>
+        ) : (
+          collaborators.map((member) => (
+            <div key={member.ID} className={styles.memberRow}>
+              <div className={styles.memberInfo}>
+                <div className={styles.avatar}>
+                  {(member.NICKNAME || member.USER_EMAIL)?.[0]}
+                </div>
+                <div>
+                  <div className={styles.memberName}>
+                    {member.NICKNAME || member.USER_EMAIL}
+                  </div>
+                  <div className={styles.memberEmail}>{member.USER_EMAIL}</div>
+                </div>
+              </div>
+              <div className={styles.memberActions}>
+                <span
+                  className={
+                    member.ROLE === "editor"
+                      ? styles.roleBadgeEditor
+                      : styles.roleBadgeViewer
+                  }
+                >
+                  {member.ROLE === "editor" ? "편집자" : "뷰어"}
+                </span>
+                <span className={styles.joinedAt}>
+                  {member.CREATED_AT
+                    ? new Date(member.CREATED_AT).toLocaleDateString()
+                    : ""}
+                </span>
+                <button
+                  className={styles.removeBtn}
+                  onClick={() => handleRemove(member.ID)}
+                >
+                  제거
+                </button>
               </div>
             </div>
-            <div className={styles.memberActions}>
-              <span
-                className={
-                  member.role === "editor"
-                    ? styles.roleBadgeEditor
-                    : styles.roleBadgeViewer
-                }
-              >
-                {member.role === "editor" ? "편집자" : "뷰어"}
-              </span>
-              <span className={styles.joinedAt}>{member.joinedAt}</span>
-              <button className={styles.removeBtn}>제거</button>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

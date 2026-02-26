@@ -1,9 +1,16 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import styles from "./Header.module.css";
 
 export default function Header() {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <header className={styles.header}>
@@ -14,9 +21,25 @@ export default function Header() {
         <Link to="/novels">내 소설</Link>
         <Link to="/payment">구독/결제</Link>
         <Link to="/mypage">마이페이지</Link>
-        <Link to="/login" className={styles.loginBtn}>
-          로그인
-        </Link>
+        {user ? (
+          <button
+            className={styles.loginBtn}
+            onClick={handleLogout}
+            style={{
+              cursor: "pointer",
+              background: "none",
+              border: "none",
+              font: "inherit",
+              color: "inherit",
+            }}
+          >
+            로그아웃
+          </button>
+        ) : (
+          <Link to="/login" className={styles.loginBtn}>
+            로그인
+          </Link>
+        )}
       </nav>
     </header>
   );

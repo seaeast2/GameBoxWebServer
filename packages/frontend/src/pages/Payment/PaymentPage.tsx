@@ -1,9 +1,47 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { paymentService } from "../../services/paymentService";
+import { useAuth } from "../../contexts/AuthContext";
 import styles from "./Payment.module.css";
 
 export default function PaymentPage() {
-  const [currentPlan] = useState("free");
+  const { user } = useAuth();
+  const [currentPlan, setCurrentPlan] = useState("free");
+  const [subscribing, setSubscribing] = useState(false);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    paymentService
+      .getStatus()
+      .then((res) => setCurrentPlan(res.data.PLAN || "free"))
+      .catch(() => {});
+  }, []);
+
+  const handleSubscribe = async (planId: string) => {
+    if (!user) {
+      setMessage("로그인이 필요합니다.");
+      return;
+    }
+    setSubscribing(true);
+    setMessage("");
+    try {
+      await paymentService.subscribe(planId);
+      setCurrentPlan(planId);
+      setMessage("구독이 완료되었습니다!");
+    } catch (err: any) {
+      setMessage(err.response?.data?.message || "구독에 실패했습니다.");
+    }
+    setSubscribing(false);
+  };
+
+  const handleCancel = async () => {
+    try {
+      await paymentService.cancel();
+      setCurrentPlan("free");
+      setMessage("구독이 취소되었습니다.");
+    } catch (err: any) {
+      setMessage(err.response?.data?.message || "취소에 실패했습니다.");
+    }
+  };
 
   const plans = [
     {
@@ -51,11 +89,47 @@ export default function PaymentPage() {
     <div className={styles.container}>
       <h1>구독 & 결제</h1>
       <p className={styles.subtitle}>나에게 맞는 플랜을 선택하세요</p>
+      {message && (
+        <p
+          style={{
+            textAlign: "center",
+            color:
+              message.includes("실패") || message.includes("필요")
+                ? "#e74c3c"
+                : "#27ae60",
+            margin: "0 0 16px",
+          }}
+        >
+          {message}
+        </p>
+      )}
 
       <div className={styles.currentPlan}>
         <span>현재 플랜:</span>
-        <strong>Free</strong>
+        <strong>
+          {currentPlan === "premium"
+            ? "Premium"
+            : currentPlan === "team"
+              ? "Team"
+              : "Free"}
+        </strong>
         <span className={styles.planStatus}>활성</span>
+        {currentPlan !== "free" && (
+          <button
+            onClick={handleCancel}
+            style={{
+              marginLeft: 12,
+              background: "#e74c3c",
+              color: "#fff",
+              border: "none",
+              padding: "4px 12px",
+              borderRadius: 6,
+              cursor: "pointer",
+            }}
+          >
+            구독 취소
+          </button>
+        )}
       </div>
 
       <div className={styles.plans}>
@@ -82,9 +156,14 @@ export default function PaymentPage() {
               className={
                 currentPlan === plan.id ? styles.currentBtn : styles.selectBtn
               }
-              disabled={currentPlan === plan.id}
+              disabled={currentPlan === plan.id || subscribing}
+              onClick={() => handleSubscribe(plan.id)}
             >
-              {currentPlan === plan.id ? "현재 이용 중" : "구독하기"}
+              {currentPlan === plan.id
+                ? "현재 이용 중"
+                : subscribing
+                  ? "처리 중..."
+                  : "구독하기"}
             </button>
           </div>
         ))}

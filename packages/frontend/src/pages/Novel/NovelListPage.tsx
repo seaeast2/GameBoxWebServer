@@ -1,32 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { novelService, Novel } from "../../services/novelService";
 import styles from "./Novel.module.css";
 
-const mockNovels = [
-  {
-    id: "1",
-    title: "검과 마법의 세계",
-    genre: "판타지",
-    updatedAt: "2026-02-20",
-    episodes: 12,
-  },
-  {
-    id: "2",
-    title: "별이 내리는 밤",
-    genre: "로맨스",
-    updatedAt: "2026-02-18",
-    episodes: 8,
-  },
-  {
-    id: "3",
-    title: "시간의 균열",
-    genre: "SF",
-    updatedAt: "2026-02-15",
-    episodes: 5,
-  },
-];
-
 export default function NovelListPage() {
+  const [novels, setNovels] = useState<Novel[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    novelService
+      .list()
+      .then((res) => setNovels(res.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -35,25 +23,37 @@ export default function NovelListPage() {
           + 새 소설 쓰기
         </Link>
       </div>
-      <div className={styles.grid}>
-        {mockNovels.map((novel) => (
-          <Link
-            to={`/novels/${novel.id}`}
-            key={novel.id}
-            className={styles.card}
-          >
-            <div className={styles.cardCover}>
-              <span className={styles.genre}>{novel.genre}</span>
-            </div>
-            <div className={styles.cardBody}>
-              <h3 className={styles.cardTitle}>{novel.title}</h3>
-              <p className={styles.cardMeta}>
-                {novel.episodes}화 · {novel.updatedAt}
-              </p>
-            </div>
-          </Link>
-        ))}
-      </div>
+      {loading ? (
+        <p style={{ textAlign: "center", padding: 40, color: "#888" }}>
+          로딩 중...
+        </p>
+      ) : novels.length === 0 ? (
+        <p style={{ textAlign: "center", padding: 40, color: "#888" }}>
+          아직 작성한 소설이 없습니다. 새 소설을 시작해보세요!
+        </p>
+      ) : (
+        <div className={styles.grid}>
+          {novels.map((novel) => (
+            <Link
+              to={`/novels/${novel.ID}`}
+              key={novel.ID}
+              className={styles.card}
+            >
+              <div className={styles.cardCover}>
+                <span className={styles.genre}>{novel.GENRE || "미분류"}</span>
+              </div>
+              <div className={styles.cardBody}>
+                <h3 className={styles.cardTitle}>{novel.TITLE}</h3>
+                <p className={styles.cardMeta}>
+                  {novel.UPDATED_AT
+                    ? new Date(novel.UPDATED_AT).toLocaleDateString()
+                    : ""}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

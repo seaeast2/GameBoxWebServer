@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
+import { episodeService } from "../../services/episodeService";
+import { characterService, Character } from "../../services/characterService";
+import { worldService, World } from "../../services/worldService";
+import { mapService, MapItem } from "../../services/mapService";
+import { versionService, Version } from "../../services/versionService";
+import { timelineService, Timeline } from "../../services/timelineService";
 import styles from "./Editor.module.css";
 
 export default function EditorPage() {
-  const { id } = useParams();
+  const { id: novelId } = useParams();
   const [content, setContent] = useState("");
   const [activeTab, setActiveTab] = useState<"character" | "world" | "map">(
     "character",
@@ -12,8 +18,91 @@ export default function EditorPage() {
     "ai",
   );
   const [episode, setEpisode] = useState(1);
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState("");
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const [worlds, setWorlds] = useState<World[]>([]);
+  const [maps, setMaps] = useState<MapItem[]>([]);
+  const [versions, setVersions] = useState<Version[]>([]);
+  const [timelines, setTimelines] = useState<Timeline[]>([]);
+  const [episodeCount, setEpisodeCount] = useState(12);
+  const [hasExisting, setHasExisting] = useState(false);
 
-  const episodes = Array.from({ length: 12 }, (_, i) => i + 1);
+  const episodes = Array.from({ length: episodeCount }, (_, i) => i + 1);
+
+  const loadSidebarData = useCallback(async () => {
+    if (!novelId) return;
+    const [charRes, worldRes, mapRes, tlRes] = await Promise.all([
+      characterService.list(novelId).catch(() => ({ data: [] })),
+      worldService.list(novelId).catch(() => ({ data: [] })),
+      mapService.list(novelId).catch(() => ({ data: [] })),
+      timelineService.list(novelId).catch(() => ({ data: [] })),
+    ]);
+    setCharacters(charRes.data);
+    setWorlds(worldRes.data);
+    setMaps(mapRes.data);
+    setTimelines(tlRes.data);
+    if (tlRes.data.length > 0) {
+      const maxEp = Math.max(...tlRes.data.map((t: Timeline) => t.EPISODE));
+      setEpisodeCount(Math.max(maxEp + 1, 12));
+    }
+  }, [novelId]);
+
+  const loadEpisodeContent = useCallback(async () => {
+    if (!novelId) return;
+    try {
+      const res = await episodeService.getText(novelId, episode);
+      setContent(res.data.CONTENT || "");
+      setHasExisting(true);
+    } catch {
+      setContent("");
+      setHasExisting(false);
+    }
+  }, [novelId, episode]);
+
+  const loadVersions = useCallback(async () => {
+    if (!novelId) return;
+    try {
+      const res = await versionService.list(novelId);
+      setVersions(res.data);
+    } catch {
+      setVersions([]);
+    }
+  }, [novelId]);
+
+  useEffect(() => {
+    loadSidebarData();
+  }, [loadSidebarData]);
+  useEffect(() => {
+    loadEpisodeContent();
+  }, [loadEpisodeContent]);
+  useEffect(() => {
+    if (rightTab === "version") loadVersions();
+  }, [rightTab, loadVersions]);
+
+  const handleSave = async () => {
+    if (!novelId) return;
+    setSaving(true);
+    setSaveMsg("");
+    try {
+      if (hasExisting) {
+        await episodeService.updateText(novelId, episode, content);
+      } else {
+        await episodeService.saveText(novelId, episode, content);
+        setHasExisting(true);
+      }
+      setSaveMsg("저장됨");
+      setTimeout(() => setSaveMsg(""), 2000);
+    } catch {
+      setSaveMsg("저장 실패");
+    }
+    setSaving(false);
+  };
+
+  const getCharStats = (char: Character) => {
+    if (!char.STATS) return {};
+    return typeof char.STATS === "string" ? JSON.parse(char.STATS) : char.STATS;
+  };
 
   return (
     <div className={styles.editorLayout}>
@@ -42,36 +131,69 @@ export default function EditorPage() {
         <div className={styles.panelContent}>
           {activeTab === "character" && (
             <div>
-              <div className={styles.listItem}>
-                <strong>주인공</strong>
-                <span>Lv.15 · 검사</span>
-              </div>
-              <div className={styles.listItem}>
-                <strong>히로인</strong>
-                <span>Lv.12 · 마법사</span>
-              </div>
-              <div className={styles.listItem}>
-                <strong>동료1</strong>
-                <span>Lv.10 · 궁수</span>
-              </div>
+              {characters.length === 0 ? (
+                <p style={{ padding: 12, color: "#888", fontSize: "0.9rem" }}>
+                  등록된 캐릭터가 없습니다
+                </p>
+              ) : (
+                characters.map((c) => (
+                  <div key={c.ID} className={styles.listItem}>
+                    <strong>{c.NAME}</strong>
+                    <span>
+                      Lv.{c.LEVEL || 1} · {getCharStats(c).class || "미정"}
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
           )}
           {activeTab === "world" && (
             <div>
-              <div className={styles.listItem}>
-                <strong>아르카디아 왕국</strong>
-                <span>인간 중심 국가</span>
-              </div>
-              <div className={styles.listItem}>
-                <strong>엘프의 숲</strong>
-                <span>고대 엘프 거주지</span>
-              </div>
+              {worlds.length === 0 ? (
+                <p style={{ padding: 12, color: "#888", fontSize: "0.9rem" }}>
+                  등록된 세계관이 없습니다
+                </p>
+              ) : (
+                worlds.map((w) => (
+                  <div key={w.ID} className={styles.listItem}>
+                    <strong>{w.NAME}</strong>
+                    <span>{w.DESCRIPTION?.slice(0, 20) || ""}</span>
+                  </div>
+                ))
+              )}
             </div>
           )}
           {activeTab === "map" && (
-            <div className={styles.mapPlaceholder}>
-              <p>🗺️ 세계 지도</p>
-              <span>지도 이미지가 표시됩니다</span>
+            <div>
+              {maps.length === 0 ? (
+                <div className={styles.mapPlaceholder}>
+                  <p>🗺️ 세계 지도</p>
+                  <span>등록된 지도가 없습니다</span>
+                </div>
+              ) : (
+                maps.map((m) => (
+                  <div key={m.ID} className={styles.listItem}>
+                    <strong>
+                      {(typeof m.METADATA === "object"
+                        ? m.METADATA?.name
+                        : "") || `지도 #${m.ID}`}
+                    </strong>
+                    {m.IMAGE_URL && (
+                      <img
+                        src={m.IMAGE_URL}
+                        alt=""
+                        style={{
+                          width: "100%",
+                          maxHeight: 100,
+                          objectFit: "cover",
+                          borderRadius: 4,
+                          marginTop: 4,
+                        }}
+                      />
+                    )}
+                  </div>
+                ))
+              )}
             </div>
           )}
         </div>
@@ -109,7 +231,25 @@ export default function EditorPage() {
               🤖
             </button>
           </div>
-          <button className={styles.saveBtn}>저장</button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {saveMsg && (
+              <span
+                style={{
+                  fontSize: "0.85rem",
+                  color: saveMsg === "저장됨" ? "#27ae60" : "#e74c3c",
+                }}
+              >
+                {saveMsg}
+              </span>
+            )}
+            <button
+              className={styles.saveBtn}
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? "저장 중..." : "저장"}
+            </button>
+          </div>
         </div>
         <textarea
           className={styles.editorArea}
@@ -159,43 +299,29 @@ export default function EditorPage() {
           )}
           {rightTab === "foreshadow" && (
             <div>
-              <div className={styles.foreshadowItem}>
-                <span
-                  className={styles.foreshadowStatus}
-                  data-resolved="false"
-                />
-                <span>주인공의 목걸이 비밀</span>
-              </div>
-              <div className={styles.foreshadowItem}>
-                <span
-                  className={styles.foreshadowStatus}
-                  data-resolved="true"
-                />
-                <span>마을 장로의 예언 (회수됨)</span>
-              </div>
-              <div className={styles.foreshadowItem}>
-                <span
-                  className={styles.foreshadowStatus}
-                  data-resolved="false"
-                />
-                <span>검은 기사의 정체</span>
-              </div>
+              <p style={{ padding: 8, color: "#888", fontSize: "0.85rem" }}>
+                타임라인에서 복선을 관리합니다
+              </p>
             </div>
           )}
           {rightTab === "version" && (
             <div>
-              <div className={styles.versionItem}>
-                <strong>v3</strong>
-                <span>2026-02-20 15:30</span>
-              </div>
-              <div className={styles.versionItem}>
-                <strong>v2</strong>
-                <span>2026-02-19 10:00</span>
-              </div>
-              <div className={styles.versionItem}>
-                <strong>v1</strong>
-                <span>2026-02-18 09:00</span>
-              </div>
+              {versions.length === 0 ? (
+                <p style={{ padding: 12, color: "#888", fontSize: "0.9rem" }}>
+                  저장된 버전이 없습니다
+                </p>
+              ) : (
+                versions.map((v) => (
+                  <div key={v.ID} className={styles.versionItem}>
+                    <strong>v{v.ID}</strong>
+                    <span>
+                      {v.CREATED_AT
+                        ? new Date(v.CREATED_AT).toLocaleString()
+                        : ""}
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
           )}
         </div>
@@ -205,16 +331,27 @@ export default function EditorPage() {
       <div className={styles.bottomPanel}>
         <h3 className={styles.bottomTitle}>⏳ 타임라인</h3>
         <div className={styles.timeline}>
-          {episodes.map((ep) => (
-            <div
-              key={ep}
-              className={`${styles.timelineItem} ${ep === episode ? styles.timelineActive : ""}`}
-              onClick={() => setEpisode(ep)}
-            >
-              <div className={styles.timelineDot} />
-              <span>{ep}화</span>
-            </div>
-          ))}
+          {timelines.length > 0
+            ? timelines.map((tl) => (
+                <div
+                  key={tl.ID}
+                  className={`${styles.timelineItem} ${tl.EPISODE === episode ? styles.timelineActive : ""}`}
+                  onClick={() => setEpisode(tl.EPISODE)}
+                >
+                  <div className={styles.timelineDot} />
+                  <span>{tl.EPISODE}화</span>
+                </div>
+              ))
+            : episodes.map((ep) => (
+                <div
+                  key={ep}
+                  className={`${styles.timelineItem} ${ep === episode ? styles.timelineActive : ""}`}
+                  onClick={() => setEpisode(ep)}
+                >
+                  <div className={styles.timelineDot} />
+                  <span>{ep}화</span>
+                </div>
+              ))}
         </div>
       </div>
     </div>

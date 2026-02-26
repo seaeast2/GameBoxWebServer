@@ -1,23 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { mapService, MapItem } from "../../services/mapService";
 import styles from "./Map.module.css";
 
 export default function MapPage() {
-  const { id } = useParams();
+  const { id: novelId } = useParams();
+  const [maps, setMaps] = useState<MapItem[]>([]);
   const [showUpload, setShowUpload] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState({ name: "", imageUrl: "" });
 
-  const mockMaps = [
-    {
-      id: "1",
-      name: "대륙 전체 지도",
-      description: "아르카디아 대륙의 전체 지도",
-    },
-    {
-      id: "2",
-      name: "아르카디아 왕국 상세 지도",
-      description: "왕국 내부 도시 및 주요 거점",
-    },
-  ];
+  const loadMaps = async () => {
+    if (!novelId) return;
+    try {
+      const res = await mapService.list(novelId);
+      setMaps(res.data);
+    } catch {}
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadMaps();
+  }, [novelId]);
+
+  const getMeta = (map: MapItem) => {
+    if (!map.METADATA) return { name: "" };
+    return typeof map.METADATA === "string"
+      ? JSON.parse(map.METADATA)
+      : map.METADATA;
+  };
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!novelId) return;
+    try {
+      await mapService.create(novelId, {
+        image_url: form.imageUrl || undefined,
+        metadata: { name: form.name },
+      });
+      setForm({ name: "", imageUrl: "" });
+      setShowUpload(false);
+      loadMaps();
+    } catch {}
+  };
+
+  const handleDelete = async (mapId: number) => {
+    try {
+      await mapService.delete(String(mapId));
+      loadMaps();
+    } catch {}
+  };
 
   return (
     <div className={styles.container}>
@@ -33,37 +65,74 @@ export default function MapPage() {
 
       {showUpload && (
         <div className={styles.uploadCard}>
-          <h3>새 지도 업로드</h3>
-          <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
-            <input className={styles.input} placeholder="지도 이름" />
-            <div className={styles.dropzone}>
-              <p>🗺️</p>
-              <span>이미지를 드래그하거나 클릭하여 업로드</span>
-              <span className={styles.dropzoneHint}>
-                PNG, JPG, SVG (최대 10MB)
-              </span>
-            </div>
+          <h3>새 지도 추가</h3>
+          <form className={styles.form} onSubmit={handleCreate}>
+            <input
+              className={styles.input}
+              placeholder="지도 이름"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
+            <input
+              className={styles.input}
+              placeholder="이미지 URL (선택)"
+              value={form.imageUrl}
+              onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+            />
             <button className={styles.submitBtn} type="submit">
-              업로드
+              추가
             </button>
           </form>
         </div>
       )}
 
-      <div className={styles.grid}>
-        {mockMaps.map((map) => (
-          <div key={map.id} className={styles.mapCard}>
-            <div className={styles.mapPreview}>
-              <span>🗺️</span>
-              <p>지도 미리보기</p>
+      {loading ? (
+        <p style={{ textAlign: "center", padding: 40, color: "#888" }}>
+          로딩 중...
+        </p>
+      ) : maps.length === 0 ? (
+        <p style={{ textAlign: "center", padding: 40, color: "#888" }}>
+          등록된 지도가 없습니다
+        </p>
+      ) : (
+        <div className={styles.grid}>
+          {maps.map((map) => (
+            <div key={map.ID} className={styles.mapCard}>
+              <div className={styles.mapPreview}>
+                {map.IMAGE_URL ? (
+                  <img
+                    src={map.IMAGE_URL}
+                    alt={getMeta(map).name || "지도"}
+                    style={{ maxWidth: "100%", maxHeight: "100%" }}
+                  />
+                ) : (
+                  <>
+                    <span>🗺️</span>
+                    <p>지도 미리보기</p>
+                  </>
+                )}
+              </div>
+              <div className={styles.mapInfo}>
+                <h3>{getMeta(map).name || `지도 #${map.ID}`}</h3>
+                <button
+                  onClick={() => handleDelete(map.ID)}
+                  style={{
+                    background: "#e74c3c",
+                    color: "#fff",
+                    border: "none",
+                    padding: "4px 10px",
+                    borderRadius: 4,
+                    cursor: "pointer",
+                    fontSize: "0.8rem",
+                  }}
+                >
+                  삭제
+                </button>
+              </div>
             </div>
-            <div className={styles.mapInfo}>
-              <h3>{map.name}</h3>
-              <p>{map.description}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <div className={styles.mapViewer}>
         <h2>지도 뷰어</h2>

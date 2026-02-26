@@ -1,114 +1,198 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { timelineService, Timeline } from "../../services/timelineService";
+import {
+  foreshadowService,
+  Foreshadow,
+} from "../../services/foreshadowService";
 import styles from "./Timeline.module.css";
 
-const mockTimelines = [
-  {
-    id: "1",
-    episode: 1,
-    summary: "주인공이 마을에서 평범하게 생활한다.",
-    characters: ["주인공"],
-    foreshadows: ["목걸이의 비밀"],
-    location: "시작 마을",
-  },
-  {
-    id: "2",
-    episode: 2,
-    summary: "마을에 몬스터가 나타나다. 주인공이 검을 잡는다.",
-    characters: ["주인공", "동료1"],
-    foreshadows: [],
-    location: "시작 마을 외곽",
-  },
-  {
-    id: "3",
-    episode: 3,
-    summary: "동료와 함께 여행을 떠난다.",
-    characters: ["주인공", "동료1"],
-    foreshadows: ["장로의 예언"],
-    location: "왕국 도로",
-  },
-  {
-    id: "4",
-    episode: 4,
-    summary: "왕국에 도착하여 기사단에 대해 알게 된다.",
-    characters: ["주인공", "동료1", "히로인"],
-    foreshadows: [],
-    location: "아르카디아 왕국",
-  },
-  {
-    id: "5",
-    episode: 5,
-    summary: "검은 기사와 첫 조우. 팀이 패배한다.",
-    characters: ["주인공", "동료1", "히로인"],
-    foreshadows: ["검은 기사의 정체"],
-    location: "왕국 외곽 던전",
-  },
-];
-
 export default function TimelinePage() {
-  const { id } = useParams();
-  const [selected, setSelected] = useState<string | null>(null);
+  const { id: novelId } = useParams();
+  const [timelines, setTimelines] = useState<Timeline[]>([]);
+  const [foreshadows, setForeshadows] = useState<Record<number, Foreshadow[]>>(
+    {},
+  );
+  const [selected, setSelected] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ episode: 1, summary: "" });
 
-  const selectedTl = mockTimelines.find((t) => t.id === selected);
+  const loadTimelines = async () => {
+    if (!novelId) return;
+    try {
+      const res = await timelineService.list(novelId);
+      setTimelines(res.data);
+      // Load foreshadows for each timeline
+      const fsMap: Record<number, Foreshadow[]> = {};
+      await Promise.all(
+        res.data.map(async (tl: Timeline) => {
+          try {
+            const fsRes = await foreshadowService.list(String(tl.ID));
+            fsMap[tl.ID] = fsRes.data;
+          } catch {
+            fsMap[tl.ID] = [];
+          }
+        }),
+      );
+      setForeshadows(fsMap);
+    } catch {}
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadTimelines();
+  }, [novelId]);
+
+  const selectedTl = timelines.find((t) => t.ID === selected);
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!novelId) return;
+    try {
+      await timelineService.create(novelId, {
+        episode: form.episode,
+        summary: form.summary,
+      });
+      setForm({ episode: form.episode + 1, summary: "" });
+      setShowForm(false);
+      loadTimelines();
+    } catch {}
+  };
+
+  const handleDelete = async (tlId: number) => {
+    try {
+      await timelineService.delete(String(tlId));
+      if (selected === tlId) setSelected(null);
+      loadTimelines();
+    } catch {}
+  };
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h1>타임라인 관리</h1>
-        <button className={styles.addBtn}>+ 타임라인 추가</button>
+        <button
+          className={styles.addBtn}
+          onClick={() => setShowForm(!showForm)}
+        >
+          + 타임라인 추가
+        </button>
       </div>
 
-      <div className={styles.timelineView}>
-        <div className={styles.line} />
-        {mockTimelines.map((tl) => (
-          <div
-            key={tl.id}
-            className={`${styles.tlItem} ${selected === tl.id ? styles.tlItemActive : ""}`}
-            onClick={() => setSelected(tl.id)}
+      {showForm && (
+        <div
+          style={{
+            background: "#fff",
+            padding: 20,
+            borderRadius: 12,
+            marginBottom: 24,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          }}
+        >
+          <h3>새 타임라인 추가</h3>
+          <form
+            onSubmit={handleCreate}
+            style={{ display: "flex", flexDirection: "column", gap: 12 }}
           >
-            <div className={styles.tlDot} />
-            <div className={styles.tlCard}>
-              <div className={styles.tlEpisode}>{tl.episode}화</div>
-              <p className={styles.tlSummary}>{tl.summary}</p>
-              <div className={styles.tlMeta}>
-                <span>📍 {tl.location}</span>
-                <span>👥 {tl.characters.length}명</span>
-                {tl.foreshadows.length > 0 && (
-                  <span>🔮 복선 {tl.foreshadows.length}</span>
-                )}
+            <input
+              type="number"
+              min={1}
+              value={form.episode}
+              onChange={(e) =>
+                setForm({ ...form, episode: Number(e.target.value) })
+              }
+              placeholder="에피소드 번호"
+              style={{ padding: 10, borderRadius: 8, border: "1px solid #ddd" }}
+            />
+            <textarea
+              rows={3}
+              value={form.summary}
+              onChange={(e) => setForm({ ...form, summary: e.target.value })}
+              placeholder="줄거리 요약"
+              style={{ padding: 10, borderRadius: 8, border: "1px solid #ddd" }}
+            />
+            <button
+              type="submit"
+              style={{
+                padding: 10,
+                background: "#5c6bc0",
+                color: "#fff",
+                border: "none",
+                borderRadius: 8,
+                cursor: "pointer",
+              }}
+            >
+              추가
+            </button>
+          </form>
+        </div>
+      )}
+
+      {loading ? (
+        <p style={{ textAlign: "center", padding: 40, color: "#888" }}>
+          로딩 중...
+        </p>
+      ) : timelines.length === 0 ? (
+        <p style={{ textAlign: "center", padding: 40, color: "#888" }}>
+          등록된 타임라인이 없습니다
+        </p>
+      ) : (
+        <div className={styles.timelineView}>
+          <div className={styles.line} />
+          {timelines.map((tl) => (
+            <div
+              key={tl.ID}
+              className={`${styles.tlItem} ${selected === tl.ID ? styles.tlItemActive : ""}`}
+              onClick={() => setSelected(tl.ID)}
+            >
+              <div className={styles.tlDot} />
+              <div className={styles.tlCard}>
+                <div className={styles.tlEpisode}>{tl.EPISODE}화</div>
+                <p className={styles.tlSummary}>{tl.SUMMARY}</p>
+                <div className={styles.tlMeta}>
+                  {(foreshadows[tl.ID]?.length || 0) > 0 && (
+                    <span>🔮 복선 {foreshadows[tl.ID].length}</span>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {selectedTl && (
         <div className={styles.detail}>
-          <h2>{selectedTl.episode}화 상세</h2>
-          <p className={styles.detailSummary}>{selectedTl.summary}</p>
-
-          <div className={styles.detailSection}>
-            <h3>📍 장소</h3>
-            <p>{selectedTl.location}</p>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <h2>{selectedTl.EPISODE}화 상세</h2>
+            <button
+              onClick={() => handleDelete(selectedTl.ID)}
+              style={{
+                background: "#e74c3c",
+                color: "#fff",
+                border: "none",
+                padding: "6px 12px",
+                borderRadius: 6,
+                cursor: "pointer",
+              }}
+            >
+              삭제
+            </button>
           </div>
+          <p className={styles.detailSummary}>{selectedTl.SUMMARY}</p>
 
-          <div className={styles.detailSection}>
-            <h3>👥 등장 캐릭터</h3>
-            <div className={styles.charTags}>
-              {selectedTl.characters.map((c) => (
-                <span key={c} className={styles.charTag}>
-                  {c}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {selectedTl.foreshadows.length > 0 && (
+          {(foreshadows[selectedTl.ID]?.length || 0) > 0 && (
             <div className={styles.detailSection}>
               <h3>🔮 복선 마커</h3>
-              {selectedTl.foreshadows.map((f) => (
-                <div key={f} className={styles.foreshadowTag}>
-                  {f}
+              {foreshadows[selectedTl.ID].map((f) => (
+                <div key={f.ID} className={styles.foreshadowTag}>
+                  {f.DESCRIPTION} {f.RESOLVED === "Y" ? "(회수됨)" : ""}
                 </div>
               ))}
             </div>

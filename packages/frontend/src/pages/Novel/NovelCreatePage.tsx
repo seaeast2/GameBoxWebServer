@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { novelService } from "../../services/novelService";
 import styles from "./Novel.module.css";
 
 export default function NovelCreatePage() {
@@ -8,12 +10,44 @@ export default function NovelCreatePage() {
     description: "",
     isCollab: false,
   });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.title.trim()) {
+      setError("소설 제목을 입력하세요.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    try {
+      const res = await novelService.create({
+        title: form.title,
+        genre: form.genre || undefined,
+        description: form.description || undefined,
+      });
+      // If collaboration enabled, update it
+      if (form.isCollab) {
+        await novelService.update(String(res.data.ID), { is_collab: "Y" });
+      }
+      navigate(`/novels/${res.data.ID}`);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "소설 생성에 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className={styles.container}>
       <div className={styles.formWrapper}>
         <h1>새 소설 쓰기</h1>
-        <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
+        {error && (
+          <p style={{ color: "#e74c3c", margin: "0 0 16px" }}>{error}</p>
+        )}
+        <form className={styles.form} onSubmit={handleSubmit}>
           <label className={styles.label}>소설 제목</label>
           <input
             className={styles.input}
@@ -57,8 +91,8 @@ export default function NovelCreatePage() {
             협업 소설로 생성
           </label>
 
-          <button className={styles.submitBtn} type="submit">
-            소설 생성
+          <button className={styles.submitBtn} type="submit" disabled={loading}>
+            {loading ? "생성 중..." : "소설 생성"}
           </button>
         </form>
       </div>

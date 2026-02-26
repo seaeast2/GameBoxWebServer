@@ -1,41 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { characterService, Character } from "../../services/characterService";
 import styles from "./Character.module.css";
 
-const mockCharacters = [
-  {
-    id: "1",
-    name: "주인공",
-    level: 15,
-    className: "검사",
-    stats: { str: 20, dex: 15, int: 10, luk: 12 },
-    items: ["불꽃의 검", "미스릴 갑옷"],
-  },
-  {
-    id: "2",
-    name: "히로인",
-    level: 12,
-    className: "마법사",
-    stats: { str: 5, dex: 10, int: 25, luk: 8 },
-    items: ["현자의 지팡이", "마법 로브"],
-  },
-  {
-    id: "3",
-    name: "동료1",
-    level: 10,
-    className: "궁수",
-    stats: { str: 10, dex: 22, int: 8, luk: 15 },
-    items: ["바람의 활", "가죽 갑옷"],
-  },
-];
-
 export default function CharacterPage() {
-  const { id } = useParams();
-  const [selected, setSelected] = useState<string | null>(null);
+  const { id: novelId } = useParams();
+  const [characters, setCharacters] = useState<Character[]>([]);
+  const [selected, setSelected] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: "", className: "", level: 1 });
+  const [loading, setLoading] = useState(true);
 
-  const selectedChar = mockCharacters.find((c) => c.id === selected);
+  const loadCharacters = async () => {
+    if (!novelId) return;
+    try {
+      const res = await characterService.list(novelId);
+      setCharacters(res.data);
+    } catch {}
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadCharacters();
+  }, [novelId]);
+
+  const selectedChar = characters.find((c) => c.ID === selected);
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!novelId || !form.name.trim()) return;
+    try {
+      await characterService.create(novelId, {
+        name: form.name,
+        level: form.level,
+        stats: { class: form.className },
+      });
+      setForm({ name: "", className: "", level: 1 });
+      setShowForm(false);
+      loadCharacters();
+    } catch {}
+  };
+
+  const handleDelete = async (charId: number) => {
+    try {
+      await characterService.delete(String(charId));
+      if (selected === charId) setSelected(null);
+      loadCharacters();
+    } catch {}
+  };
+
+  const getStats = (char: Character) => {
+    if (!char.STATS) return {};
+    if (typeof char.STATS === "string") {
+      try {
+        return JSON.parse(char.STATS);
+      } catch {
+        return {};
+      }
+    }
+    return char.STATS;
+  };
+
+  const getItems = (char: Character): string[] => {
+    if (!char.ITEMS) return [];
+    if (typeof char.ITEMS === "string") {
+      try {
+        return JSON.parse(char.ITEMS);
+      } catch {
+        return [];
+      }
+    }
+    if (Array.isArray(char.ITEMS)) return char.ITEMS;
+    return [];
+  };
 
   return (
     <div className={styles.container}>
@@ -52,7 +89,7 @@ export default function CharacterPage() {
       {showForm && (
         <div className={styles.formCard}>
           <h3>새 캐릭터 생성</h3>
-          <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
+          <form className={styles.form} onSubmit={handleCreate}>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
                 <label>이름</label>
@@ -94,59 +131,105 @@ export default function CharacterPage() {
         </div>
       )}
 
-      <div className={styles.content}>
-        <div className={styles.charList}>
-          {mockCharacters.map((char) => (
-            <div
-              key={char.id}
-              className={`${styles.charCard} ${selected === char.id ? styles.charCardActive : ""}`}
-              onClick={() => setSelected(char.id)}
-            >
-              <div className={styles.charAvatar}>{char.name[0]}</div>
-              <div>
-                <div className={styles.charName}>{char.name}</div>
-                <div className={styles.charInfo}>
-                  Lv.{char.level} · {char.className}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {selectedChar && (
-          <div className={styles.detail}>
-            <h2>{selectedChar.name}</h2>
-            <p className={styles.detailSub}>
-              Lv.{selectedChar.level} · {selectedChar.className}
-            </p>
-
-            <h3>능력치</h3>
-            <div className={styles.statsGrid}>
-              {Object.entries(selectedChar.stats).map(([key, val]) => (
-                <div key={key} className={styles.statItem}>
-                  <span className={styles.statKey}>{key.toUpperCase()}</span>
-                  <div className={styles.statBar}>
-                    <div
-                      className={styles.statFill}
-                      style={{ width: `${(val / 30) * 100}%` }}
-                    />
+      {loading ? (
+        <p style={{ textAlign: "center", padding: 40, color: "#888" }}>
+          로딩 중...
+        </p>
+      ) : (
+        <div className={styles.content}>
+          <div className={styles.charList}>
+            {characters.length === 0 ? (
+              <p style={{ padding: 20, color: "#888", textAlign: "center" }}>
+                등록된 캐릭터가 없습니다
+              </p>
+            ) : (
+              characters.map((char) => (
+                <div
+                  key={char.ID}
+                  className={`${styles.charCard} ${selected === char.ID ? styles.charCardActive : ""}`}
+                  onClick={() => setSelected(char.ID)}
+                >
+                  <div className={styles.charAvatar}>{char.NAME[0]}</div>
+                  <div>
+                    <div className={styles.charName}>{char.NAME}</div>
+                    <div className={styles.charInfo}>
+                      Lv.{char.LEVEL || 1} · {getStats(char).class || "미정"}
+                    </div>
                   </div>
-                  <span className={styles.statVal}>{val}</span>
                 </div>
-              ))}
-            </div>
-
-            <h3>아이템</h3>
-            <div className={styles.itemList}>
-              {selectedChar.items.map((item, i) => (
-                <div key={i} className={styles.itemTag}>
-                  {item}
-                </div>
-              ))}
-            </div>
+              ))
+            )}
           </div>
-        )}
-      </div>
+
+          {selectedChar && (
+            <div className={styles.detail}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <h2>{selectedChar.NAME}</h2>
+                <button
+                  onClick={() => handleDelete(selectedChar.ID)}
+                  style={{
+                    background: "#e74c3c",
+                    color: "#fff",
+                    border: "none",
+                    padding: "6px 12px",
+                    borderRadius: 6,
+                    cursor: "pointer",
+                  }}
+                >
+                  삭제
+                </button>
+              </div>
+              <p className={styles.detailSub}>
+                Lv.{selectedChar.LEVEL || 1} ·{" "}
+                {getStats(selectedChar).class || "미정"}
+              </p>
+
+              {Object.keys(getStats(selectedChar)).length > 0 && (
+                <>
+                  <h3>능력치</h3>
+                  <div className={styles.statsGrid}>
+                    {Object.entries(getStats(selectedChar))
+                      .filter(([key]) => key !== "class")
+                      .map(([key, val]) => (
+                        <div key={key} className={styles.statItem}>
+                          <span className={styles.statKey}>
+                            {key.toUpperCase()}
+                          </span>
+                          <div className={styles.statBar}>
+                            <div
+                              className={styles.statFill}
+                              style={{ width: `${(Number(val) / 30) * 100}%` }}
+                            />
+                          </div>
+                          <span className={styles.statVal}>{String(val)}</span>
+                        </div>
+                      ))}
+                  </div>
+                </>
+              )}
+
+              {getItems(selectedChar).length > 0 && (
+                <>
+                  <h3>아이템</h3>
+                  <div className={styles.itemList}>
+                    {getItems(selectedChar).map((item, i) => (
+                      <div key={i} className={styles.itemTag}>
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

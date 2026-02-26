@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import styles from "./Auth.module.css";
 
 export default function SignupPage() {
@@ -9,9 +10,35 @@ export default function SignupPage() {
     passwordConfirm: "",
     nickname: "",
   });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { signup } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (form.password !== form.passwordConfirm) {
+      setError("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+    if (form.password.length < 6) {
+      setError("비밀번호는 6자 이상이어야 합니다.");
+      return;
+    }
+    setLoading(true);
+    try {
+      await signup(form.email, form.password, form.nickname);
+      navigate("/novels");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "회원가입에 실패했습니다.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -21,7 +48,18 @@ export default function SignupPage() {
         <p className={styles.subtitle}>
           웹소설 작가의 방에 오신 것을 환영합니다
         </p>
-        <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
+        {error && (
+          <p
+            style={{
+              color: "#e74c3c",
+              textAlign: "center",
+              margin: "0 0 16px",
+            }}
+          >
+            {error}
+          </p>
+        )}
+        <form className={styles.form} onSubmit={handleSubmit}>
           <label className={styles.label}>닉네임</label>
           <input
             className={styles.input}
@@ -58,8 +96,8 @@ export default function SignupPage() {
             value={form.passwordConfirm}
             onChange={handleChange}
           />
-          <button className={styles.submitBtn} type="submit">
-            가입하기
+          <button className={styles.submitBtn} type="submit" disabled={loading}>
+            {loading ? "가입 중..." : "가입하기"}
           </button>
         </form>
         <p className={styles.footer}>
