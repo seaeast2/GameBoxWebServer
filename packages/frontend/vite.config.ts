@@ -6,7 +6,7 @@ export default defineConfig({
     server: {
         host: '0.0.0.0',
         port: 3002,
-        allowedHosts: ['webdev99.duckdns.org'],
+        allowedHosts: ['ssulmantool.duckdns.org'],
         proxy: {
             '/api': {
                 target: 'http://localhost:3001',
