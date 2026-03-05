@@ -1,12 +1,12 @@
 import api from './api';
 
 export interface World {
-    ID: number;
-    NAME: string;
-    DESCRIPTION: string;
-    METADATA: any;
-    NOVEL_ID: number;
-    CREATED_AT: string;
+    id: number;
+    name: string;
+    description: string;
+    metadata: any;
+    novel_id: number;
+    created_at: string;
 }
 
 export interface CreateWorldRequest {

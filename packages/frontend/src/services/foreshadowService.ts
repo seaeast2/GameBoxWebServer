@@ -1,11 +1,11 @@
 import api from './api';
 
 export interface Foreshadow {
-    ID: number;
-    DESCRIPTION: string;
-    RESOLVED: string;
-    TIMELINE_ID: number;
-    CREATED_AT: string;
+    id: number;
+    description: string;
+    resolved: string;
+    timeline_id: number;
+    created_at: string;
 }
 
 export interface CreateForeshadowRequest {

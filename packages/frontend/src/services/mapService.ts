@@ -1,11 +1,11 @@
 import api from './api';
 
 export interface MapItem {
-    ID: number;
-    IMAGE_URL: string;
-    METADATA: any;
-    NOVEL_ID: number;
-    CREATED_AT: string;
+    id: number;
+    image_url: string;
+    metadata: any;
+    novel_id: number;
+    created_at: string;
 }
 
 export interface CreateMapRequest {

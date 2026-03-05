@@ -1,11 +1,11 @@
 import api from './api';
 
 export interface Version {
-    ID: number;
-    EPISODE: number;
-    CONTENT: string;
-    NOVEL_ID: number;
-    CREATED_AT: string;
+    id: number;
+    episode: number;
+    content: string;
+    novel_id: number;
+    created_at: string;
 }
 
 export const versionService = {

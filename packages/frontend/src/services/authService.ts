@@ -22,12 +22,12 @@ export interface AuthResponse {
 }
 
 export interface UserProfile {
-    ID: number;
-    EMAIL: string;
-    NICKNAME: string;
-    ROLE: string;
-    PLAN: string;
-    CREATED_AT: string;
+    id: number;
+    email: string;
+    nickname: string;
+    role: string;
+    plan: string;
+    created_at: string;
 }
 
 export const authService = {

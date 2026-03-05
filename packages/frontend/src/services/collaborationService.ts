@@ -1,12 +1,12 @@
 import api from './api';
 
 export interface Collaborator {
-    ID: number;
-    USER_EMAIL: string;
-    NICKNAME: string;
-    ROLE: string;
-    NOVEL_ID: number;
-    CREATED_AT: string;
+    id: number;
+    user_email: string;
+    nickname: string;
+    role: string;
+    novel_id: number;
+    created_at: string;
 }
 
 export interface CreateCollaborationRequest {

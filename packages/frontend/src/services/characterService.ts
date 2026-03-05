@@ -1,13 +1,13 @@
 import api from './api';
 
 export interface Character {
-    ID: number;
-    NAME: string;
-    LEVEL: number;
-    STATS: any;
-    ITEMS: any;
-    NOVEL_ID: number;
-    CREATED_AT: string;
+    id: number;
+    name: string;
+    level: number;
+    stats: any;
+    items: any;
+    novel_id: number;
+    created_at: string;
 }
 
 export interface CreateCharacterRequest {

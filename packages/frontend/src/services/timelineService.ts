@@ -1,11 +1,11 @@
 import api from './api';
 
 export interface Timeline {
-    ID: number;
-    EPISODE: number;
-    SUMMARY: string;
-    NOVEL_ID: number;
-    CREATED_AT: string;
+    id: number;
+    episode: number;
+    summary: string;
+    novel_id: number;
+    created_at: string;
 }
 
 export interface CreateTimelineRequest {

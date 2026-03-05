@@ -1,9 +1,9 @@
 import api from './api';
 
 export interface PaymentStatus {
-    PLAN: string;
-    STATUS: string;
-    EXPIRES_AT: string;
+    plan: string;
+    status: string;
+    expires_at: string;
 }
 
 export const paymentService = {

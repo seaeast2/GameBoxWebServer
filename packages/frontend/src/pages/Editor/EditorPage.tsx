@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
 import { episodeService } from "../../services/episodeService";
 import { characterService, Character } from "../../services/characterService";
 import { worldService, World } from "../../services/worldService";
@@ -10,7 +13,6 @@ import styles from "./Editor.module.css";
 
 export default function EditorPage() {
   const { id: novelId } = useParams();
-  const [content, setContent] = useState("");
   const [activeTab, setActiveTab] = useState<"character" | "world" | "map">(
     "character",
   );
@@ -27,6 +29,17 @@ export default function EditorPage() {
   const [timelines, setTimelines] = useState<Timeline[]>([]);
   const [episodeCount, setEpisodeCount] = useState(12);
   const [hasExisting, setHasExisting] = useState(false);
+  const [episodeContent, setEpisodeContent] = useState<string | null>(null);
+
+  const editor = useEditor({
+    extensions: [StarterKit, Underline],
+    content: "",
+    editorProps: {
+      attributes: {
+        class: styles.tiptapEditor,
+      },
+    },
+  });
 
   const episodes = Array.from({ length: episodeCount }, (_, i) => i + 1);
 
@@ -52,10 +65,10 @@ export default function EditorPage() {
     if (!novelId) return;
     try {
       const res = await episodeService.getText(novelId, episode);
-      setContent(res.data.CONTENT || "");
+      setEpisodeContent(res.data.content || "");
       setHasExisting(true);
     } catch {
-      setContent("");
+      setEpisodeContent("");
       setHasExisting(false);
     }
   }, [novelId, episode]);
@@ -77,13 +90,18 @@ export default function EditorPage() {
     loadEpisodeContent();
   }, [loadEpisodeContent]);
   useEffect(() => {
+    if (!editor || episodeContent === null) return;
+    editor.commands.setContent(episodeContent);
+  }, [editor, episodeContent]);
+  useEffect(() => {
     if (rightTab === "version") loadVersions();
   }, [rightTab, loadVersions]);
 
   const handleSave = async () => {
-    if (!novelId) return;
+    if (!novelId || !editor) return;
     setSaving(true);
     setSaveMsg("");
+    const content = editor.getHTML();
     try {
       if (hasExisting) {
         await episodeService.updateText(novelId, episode, content);
@@ -100,8 +118,8 @@ export default function EditorPage() {
   };
 
   const getCharStats = (char: Character) => {
-    if (!char.STATS) return {};
-    return typeof char.STATS === "string" ? JSON.parse(char.STATS) : char.STATS;
+    if (!char.stats) return {};
+    return typeof char.stats === "string" ? JSON.parse(char.stats) : char.stats;
   };
 
   return (
@@ -137,10 +155,10 @@ export default function EditorPage() {
                 </p>
               ) : (
                 characters.map((c) => (
-                  <div key={c.ID} className={styles.listItem}>
-                    <strong>{c.NAME}</strong>
+                  <div key={c.id} className={styles.listItem}>
+                    <strong>{c.name}</strong>
                     <span>
-                      Lv.{c.LEVEL || 1} · {getCharStats(c).class || "미정"}
+                      Lv.{c.level || 1} · {getCharStats(c).class || "미정"}
                     </span>
                   </div>
                 ))
@@ -155,9 +173,9 @@ export default function EditorPage() {
                 </p>
               ) : (
                 worlds.map((w) => (
-                  <div key={w.ID} className={styles.listItem}>
-                    <strong>{w.NAME}</strong>
-                    <span>{w.DESCRIPTION?.slice(0, 20) || ""}</span>
+                  <div key={w.id} className={styles.listItem}>
+                    <strong>{w.name}</strong>
+                    <span>{w.description?.slice(0, 20) || ""}</span>
                   </div>
                 ))
               )}
@@ -172,15 +190,15 @@ export default function EditorPage() {
                 </div>
               ) : (
                 maps.map((m) => (
-                  <div key={m.ID} className={styles.listItem}>
+                  <div key={m.id} className={styles.listItem}>
                     <strong>
-                      {(typeof m.METADATA === "object"
-                        ? m.METADATA?.name
-                        : "") || `지도 #${m.ID}`}
+                      {(typeof m.metadata === "object"
+                        ? m.metadata?.name
+                        : "") || `지도 #${m.id}`}
                     </strong>
-                    {m.IMAGE_URL && (
+                    {m.image_url && (
                       <img
-                        src={m.IMAGE_URL}
+                        src={m.image_url}
                         alt=""
                         style={{
                           width: "100%",
@@ -214,14 +232,77 @@ export default function EditorPage() {
             ))}
           </select>
           <div className={styles.toolbarBtns}>
-            <button className={styles.toolBtn} title="굵게">
+            <button
+              className={`${styles.toolBtn} ${editor?.isActive("bold") ? styles.toolBtnActive : ""}`}
+              title="굵게"
+              onClick={() => editor?.chain().focus().toggleBold().run()}
+            >
               <strong>B</strong>
             </button>
-            <button className={styles.toolBtn} title="기울임">
+            <button
+              className={`${styles.toolBtn} ${editor?.isActive("italic") ? styles.toolBtnActive : ""}`}
+              title="기울임"
+              onClick={() => editor?.chain().focus().toggleItalic().run()}
+            >
               <em>I</em>
             </button>
-            <button className={styles.toolBtn} title="밑줄">
+            <button
+              className={`${styles.toolBtn} ${editor?.isActive("underline") ? styles.toolBtnActive : ""}`}
+              title="밑줄"
+              onClick={() => editor?.chain().focus().toggleUnderline().run()}
+            >
               <u>U</u>
+            </button>
+            <button
+              className={`${styles.toolBtn} ${editor?.isActive("strike") ? styles.toolBtnActive : ""}`}
+              title="취소선"
+              onClick={() => editor?.chain().focus().toggleStrike().run()}
+            >
+              <s>S</s>
+            </button>
+            <span className={styles.toolDivider} />
+            <button
+              className={`${styles.toolBtn} ${editor?.isActive("heading", { level: 1 }) ? styles.toolBtnActive : ""}`}
+              title="제목 1"
+              onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
+            >
+              H1
+            </button>
+            <button
+              className={`${styles.toolBtn} ${editor?.isActive("heading", { level: 2 }) ? styles.toolBtnActive : ""}`}
+              title="제목 2"
+              onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+            >
+              H2
+            </button>
+            <button
+              className={`${styles.toolBtn} ${editor?.isActive("heading", { level: 3 }) ? styles.toolBtnActive : ""}`}
+              title="제목 3"
+              onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
+            >
+              H3
+            </button>
+            <span className={styles.toolDivider} />
+            <button
+              className={`${styles.toolBtn} ${editor?.isActive("bulletList") ? styles.toolBtnActive : ""}`}
+              title="목록"
+              onClick={() => editor?.chain().focus().toggleBulletList().run()}
+            >
+              •
+            </button>
+            <button
+              className={`${styles.toolBtn} ${editor?.isActive("orderedList") ? styles.toolBtnActive : ""}`}
+              title="번호 목록"
+              onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+            >
+              1.
+            </button>
+            <button
+              className={`${styles.toolBtn} ${editor?.isActive("blockquote") ? styles.toolBtnActive : ""}`}
+              title="인용"
+              onClick={() => editor?.chain().focus().toggleBlockquote().run()}
+            >
+              "
             </button>
             <span className={styles.toolDivider} />
             <button className={styles.toolBtn} title="복선 마커 삽입">
@@ -251,12 +332,9 @@ export default function EditorPage() {
             </button>
           </div>
         </div>
-        <textarea
-          className={styles.editorArea}
-          placeholder="여기에 글을 작성하세요..."
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        />
+        <div className={styles.editorArea}>
+          <EditorContent editor={editor} />
+        </div>
       </main>
 
       {/* 우측 사이드바: AI/복선/버전 */}
@@ -312,11 +390,11 @@ export default function EditorPage() {
                 </p>
               ) : (
                 versions.map((v) => (
-                  <div key={v.ID} className={styles.versionItem}>
-                    <strong>v{v.ID}</strong>
+                  <div key={v.id} className={styles.versionItem}>
+                    <strong>v{v.id}</strong>
                     <span>
-                      {v.CREATED_AT
-                        ? new Date(v.CREATED_AT).toLocaleString()
+                      {v.created_at
+                        ? new Date(v.created_at).toLocaleString()
                         : ""}
                     </span>
                   </div>
@@ -334,12 +412,12 @@ export default function EditorPage() {
           {timelines.length > 0
             ? timelines.map((tl) => (
                 <div
-                  key={tl.ID}
-                  className={`${styles.timelineItem} ${tl.EPISODE === episode ? styles.timelineActive : ""}`}
-                  onClick={() => setEpisode(tl.EPISODE)}
+                  key={tl.id}
+                  className={`${styles.timelineItem} ${tl.episode === episode ? styles.timelineActive : ""}`}
+                  onClick={() => setEpisode(tl.episode)}
                 >
                   <div className={styles.timelineDot} />
-                  <span>{tl.EPISODE}화</span>
+                  <span>{tl.episode}화</span>
                 </div>
               ))
             : episodes.map((ep) => (

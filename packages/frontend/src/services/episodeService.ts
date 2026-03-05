@@ -1,9 +1,11 @@
 import api from './api';
 
 export interface EpisodeText {
-    CONTENT: string;
-    EPISODE: number;
-    NOVEL_ID: number;
+    content: string;
+    episode: number;
+    novel_id: string;
+    episode_id: string;
+    updated_at: string;
 }
 
 export const episodeService = {
