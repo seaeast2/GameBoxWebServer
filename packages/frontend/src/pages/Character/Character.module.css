@@ -156,65 +156,116 @@
   border-radius: 12px;
   padding: 32px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.detailHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .detail h2 {
-  margin: 0 0 4px;
+  margin: 0;
   color: #1a1a2e;
 }
 
-.detailSub {
-  color: #888;
-  margin: 0 0 24px;
+.deleteBtn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
 }
 
-.detail h3 {
-  margin: 0 0 12px;
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section h3 {
+  margin: 0;
   color: #1a1a2e;
   font-size: 1rem;
+}
+
+.inlineEdit {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.saveBtn {
+  background: #6c5ce7;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.saveBtn:hover {
+  background: #5a4bd1;
+}
+
+.addRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.removeBtn {
+  background: none;
+  border: none;
+  color: #bbb;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.removeBtn:hover {
+  color: #e74c3c;
 }
 
 .statsGrid {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 24px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
 .statItem {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #f8f7ff;
+  border-radius: 8px;
 }
 
 .statKey {
-  width: 40px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #6c5ce7;
+  white-space: nowrap;
+  min-width: 60px;
 }
 
-.statBar {
+.statDesc {
   flex: 1;
-  height: 8px;
-  background: #f0f0f8;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.statFill {
-  height: 100%;
-  background: linear-gradient(90deg, #6c5ce7, #a29bfe);
-  border-radius: 4px;
-  transition: width 0.3s;
-}
-
-.statVal {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.9rem;
   color: #444;
-  width: 30px;
-  text-align: right;
+  line-height: 1.4;
 }
 
 .itemList {
@@ -224,10 +275,27 @@
 }
 
 .itemTag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: #f0f0f8;
   color: #6c5ce7;
-  padding: 6px 14px;
+  padding: 6px 10px 6px 14px;
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
+}
+
+.itemRemoveBtn {
+  background: none;
+  border: none;
+  color: #a29bfe;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.itemRemoveBtn:hover {
+  color: #e74c3c;
 }
